@@ -1,0 +1,72 @@
+# Is the hot-day gets more common now from July to September?
+
+## Import \$Preview
+
+```{R}
+library(tidyverse)
+load("a2weather.RData")
+head(a2weather)
+```
+
+## How to add tags for years and months?
+
+```{R}
+a2weather <- a2weather |>
+  mutate(
+    year = year(date),
+    month = month(date)
+    )
+head(a2weather)
+```
+
+## Solution
+
+1.  Define "hot-day". If no prerequisite, then draw a histogram to define.
+
+    We will define any days have max temperatures that is higher or equal to 30 degrees Celsius.
+
+2.  Distinguish "now" and "past".
+
+    "now": most recent year \~ 30 years ago from the most recent year,
+
+    "past": 30 years ago most recent year \~ 60 years ago from the most recent year.
+
+3.  Compare the proportions of hot-days between "now" and "past".
+
+    We will use the t-test.
+
+```{R}
+hot_day <- a2weather |>
+  select(year, month, tmax) |>
+  filter(month %in% c(7, 8, 9)) |>
+  group_by(year) |>
+  summarize(
+    total_days = sum(!is.na(tmax)), # sum all the non-na tmax
+    hot_days = sum(tmax >= 30, na.rm = TRUE),
+    proportion = (hot_days / total_days)
+  )
+
+# Grouping by years
+max_year <- max(hot_day$year, na.rm = T)
+
+now_data <- hot_day |>
+  filter(year >= max_year - 29,
+         year <= max_year)
+
+# Creat an interval between 2 groups
+past_data <- hot_day |>
+  filter(year >= max_year - 59,
+         year <= max_year - 30)
+
+# Create dataframe
+x <- mean(now_data$proportion, na.rm = TRUE)
+y <- mean(past_data$proportion, na.rm = TRUE)
+d <- x - y
+
+# Test the difference
+t.test(now_data$proportion, past_data$proportion, alternative = "greater")
+```
+
+# Interpretation
+
+From the printout, the average proportion of hot days was approximately 26.20% in the recent period and 22.85% in the past period, a difference of about 3.34 percentage points. However, the p-value is 0.1086, which is greater than 0.05, so we fail to reject the null hypothesis. There is not sufficient statistical evidence to conclude that hot days from July through September are more common in the recent 30-year period than in the previous 30-year period.
