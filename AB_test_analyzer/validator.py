@@ -101,7 +101,7 @@ class DataValidator:
                 counts[user_id] = 1
 
         return counts
-    
+
     def _is_duplicate(self, user_id: str, counts: dict[str, int]) -> bool:
         """
         EFFECTS: Returns True if user_id occurs more than once.
