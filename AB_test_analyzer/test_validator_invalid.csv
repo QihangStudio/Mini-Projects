@@ -1,0 +1,8 @@
+user_id,group,converted
+U001,A,1
+U002,B,0
+U003,C,1
+U004,A,2
+U005,,1
+U001,B,0
+,B,1
