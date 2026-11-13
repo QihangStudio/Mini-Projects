@@ -21,6 +21,7 @@ class DataValidator:
         self.errors = []
 
         rows = self._read_csv()
+        counts = self._count_users(rows)
 
         for row in rows:
             user_id = row["user_id"]
@@ -29,11 +30,11 @@ class DataValidator:
 
             if self._has_missing_values(row):
                 self.errors.append(f"Missing value: {row}")
-            elif self._is_valid_group(group):
+            elif not self._is_valid_group(group):
                 self.errors.append(f"Invalid group: {row}")
-            elif self._is_valid_conversion(converted):
+            elif not self._is_valid_conversion(converted):
                 self.errors.append(f"Invalid conversion: {row}")
-            elif self._is_duplicate(user_id):
+            elif self._is_duplicate(user_id, counts):
                 self.errors.append(f"Detected duplicate: {row}")
             else:
                 self.valid_data.append({
@@ -81,6 +82,26 @@ class DataValidator:
         """
         return converted in ("0", "1")
 
+    def _count_users(self, rows: list[dict[str, str]]) -> dict[str, int]:
+        """
+        EFFECTS: Returns a dictionary mapping each nonempty
+                user ID to its occurrence count.
+        """
+        counts = {}
+
+        for row in rows:
+            user_id = row["user_id"]
+
+            if not user_id:
+                continue
+
+            if user_id in counts:
+                counts[user_id] += 1
+            else:
+                counts[user_id] = 1
+
+        return counts
+    
     def _is_duplicate(self, user_id: str, counts: dict[str, int]) -> bool:
         """
         EFFECTS: Returns True if user_id occurs more than once.
