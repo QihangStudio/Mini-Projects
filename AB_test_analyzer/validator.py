@@ -27,6 +27,21 @@ class DataValidator:
             group = row["group"]
             converted = row["converted"]
 
+            if self._has_missing_values(row):
+                self.errors.append(f"Missing value: {row}")
+            elif self._is_valid_group(group):
+                self.errors.append(f"Invalid group: {row}")
+            elif self._is_valid_conversion(converted):
+                self.errors.append(f"Invalid conversion: {row}")
+            elif self._is_duplicate(user_id):
+                self.errors.append(f"Detected duplicate: {row}")
+            else:
+                self.valid_data.append({
+                    "user_id": user_id,
+                    "group": group,
+                    "converted": int(converted)
+                })
+
     def get_valid_data(self) -> list[dict[str, str | int]]:
         """Return validated records."""
         return self.valid_data
@@ -70,5 +85,4 @@ class DataValidator:
         """
         EFFECTS: Returns True if user_id occurs more than once.
         """
-        for user_id in counts:
-            return counts.get(user_id, 0) > 1
+        return counts.get(user_id, 0) > 1
