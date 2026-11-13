@@ -1,0 +1,9 @@
+Valid records: 41
+Validation errors: 9
+
+=== A/B Testing Results ===
+Group A conversion rate: 50.00%
+Group B conversion rate: 61.90%
+Z statistic: 0.7678
+P-value: 0.4426
+Conclusion: Fail to reject H0. No statistically significant difference between A and B.
